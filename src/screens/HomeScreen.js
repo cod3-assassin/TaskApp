@@ -66,14 +66,11 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#e0f7fa',
-
-
     },
     logoutContainer: {
         position: 'absolute',
         top: 10,
         right: 10,
-
     },
     header: {
         alignItems: 'center',
@@ -93,26 +90,23 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: '#ffffff',
-        borderRadius: 15,
-        padding: 20,
+        borderRadius: 20, // Rounded corners for cards
+        padding: 18,
         marginBottom: 15,
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
+        shadowOffset: { width: 0, height: 5 },
         shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 5,
+        shadowRadius: 6,
+        elevation: 6, // Shadow effect for depth
     },
     cardTitle: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 'bold',
         color: '#00796b',
     },
     cardDescription: {
         fontSize: 16,
-        color: '#555',
+        color: '#666', // Softer color for descriptions
         marginTop: 5,
     },
     buttonContainer: {

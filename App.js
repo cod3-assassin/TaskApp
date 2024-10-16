@@ -7,7 +7,6 @@ import HomeScreen from './src/screens/HomeScreen';
 import CreateTask from './src/screens/CreateTask';
 import TaskList from './src/screens/TaskList';
 import TaskDetail from './src/screens/TaskDetail';
-import TaskEdit from './src/screens/TaskEdit';
 import Register from './src/screens/Register';
 import Login from './src/screens/Login';
 
@@ -33,7 +32,6 @@ const AppNavigator = () => {
       <Stack.Screen name="TaskList" component={TaskList} />
 
       <Stack.Screen name="TaskDetail" component={TaskDetail} options={{ title: 'Task Details' }} />
-      <Stack.Screen name="TaskEdit" component={TaskEdit} options={{ title: 'Edit Task' }} />
       <Stack.Screen name="Register" component={Register} options={{ title: 'Register' }} />
       <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
     </Stack.Navigator>

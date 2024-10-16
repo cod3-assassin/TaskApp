@@ -10,8 +10,7 @@ const TaskList = () => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const navigation = useNavigation();
-
+    const [hasFetchedTasks, setHasFetchedTasks] = useState(false);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -20,20 +19,25 @@ const TaskList = () => {
     );
 
     const handleFetchTasks = async () => {
+        if (hasFetchedTasks) return;
+
         setLoading(true);
         try {
             const response = await axios.get('http://192.168.8.228:1337/api/tasks');
-            setTasks(response.data.data || []);
+            const fetchedTasks = response.data.data || [];
+            setTasks(fetchedTasks);
+            setHasFetchedTasks(true);
+
+            fetchedTasks.forEach(task => {
+                console.log('Fetched task ID:', task.id);
+            });
+
         } catch (error) {
             setError('Failed to fetch tasks. Please try again later.');
             console.error(error);
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleEditTask = (task) => {
-        navigation.navigate('TaskEdit', { task });
     };
 
     const handleDeleteTask = async (taskId) => {
@@ -53,19 +57,15 @@ const TaskList = () => {
                                 return;
                             }
 
-                            console.log('Deleting task with ID:', taskId);
-                            console.log('Using token:', token);
-
                             const response = await axios.delete(`http://192.168.8.228:1337/api/tasks/${taskId}`, {
                                 headers: {
                                     Authorization: `Bearer ${token}`,
                                 },
                             });
 
-                            console.log('Delete response:', response.status);
+                            console.log('Deleted task ID:', taskId, 'Response status:', response.status);
 
                             if (response.status === 204) {
-                                // Remove the deleted task from the list
                                 setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
                                 Alert.alert('Success', 'Task has been deleted permanently.');
                             } else {
@@ -82,7 +82,6 @@ const TaskList = () => {
     };
 
     const handleToggleTaskState = async (taskId) => {
-
         setTasks((prevTasks) =>
             prevTasks.map((task) =>
                 task.id === taskId ? { ...task, state: task.state === 'Active' ? 'Closed' : 'Active' } : task
@@ -90,13 +89,12 @@ const TaskList = () => {
         );
     };
 
-    const renderTaskItem = ({ item }) => (
+    const renderTaskItem = ({ item, index }) => (
         <TaskItem
-            title={item.title || 'Untitled Task'}
+            title={`${index + 1}. ${item.title || 'Untitled Task'}`}
             description={item.description || 'No description available'}
             date={item.date || 'No date'}
             state={item.state || 'No state'}
-            onEdit={() => handleEditTask(item)}
             onDelete={() => handleDeleteTask(item.id)}
             onToggle={() => handleToggleTaskState(item.id)}
         />

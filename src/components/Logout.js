@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet, Alert } from 'react-native';
+import { Pressable, StyleSheet, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Logout = ({ navigation }) => {
@@ -7,7 +8,7 @@ const Logout = ({ navigation }) => {
         try {
             await AsyncStorage.removeItem('jwtToken');
             Alert.alert('Logged Out', 'You have been successfully logged out.');
-            navigation.replace('Login'); // Ensure user can't go back to Home
+            navigation.replace('Login');
         } catch (error) {
             Alert.alert('Error', 'Failed to log out. Please try again.');
         }
@@ -15,7 +16,7 @@ const Logout = ({ navigation }) => {
 
     return (
         <Pressable onPress={handleLogout} style={styles.logoutButton}>
-            <Text style={styles.logoutText}>Logout</Text>
+            <Icon name="sign-out" size={24} color="black" />
         </Pressable>
     );
 };
@@ -23,11 +24,6 @@ const Logout = ({ navigation }) => {
 const styles = StyleSheet.create({
     logoutButton: {
         marginRight: 10,
-    },
-    logoutText: {
-        fontSize: 16,
-        color: 'black', // White text for better visibility in the header
-        fontWeight: 'bold',
     },
 });
 
