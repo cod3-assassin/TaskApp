@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert, ScrollView, Pressable } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useAuth } from '../components/AuthContext';
-import axios from 'axios';
+import { addTask } from '../api/taskApi';
 
 const CreateTask = ({ navigation }) => {
-    const { jwtToken } = useAuth(); // Use AuthContext to get the token
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
@@ -18,10 +16,6 @@ const CreateTask = ({ navigation }) => {
     };
 
     const handleSubmit = async () => {
-        if (!jwtToken) {
-            Alert.alert('Error', 'User not authenticated');
-            return;
-        }
         if (!title || !description) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
@@ -39,23 +33,19 @@ const CreateTask = ({ navigation }) => {
         console.log('New Task Payload:', newTaskPayload);
 
         try {
-            const response = await axios.post('http://192.168.8.228:1337/api/tasks', newTaskPayload, {
-                headers: {
-                    Authorization: `Bearer ${jwtToken}`, // Use token from context
-                },
-            });
+            await addTask(newTaskPayload);
             Alert.alert('Success', 'Task created successfully!');
-            console.log('Task Created:', response.data);
             setTitle('');
             setDescription('');
             setDate(new Date());
             navigation.navigate('TaskList');
         } catch (error) {
-            console.log('Error message:', error.message);
-            console.log('Error response:', error.response?.data);
+            console.error('Error creating task:', error);
             Alert.alert('Error', error.response?.data?.error?.message || 'Failed to create task');
         }
-    }; return (
+    };
+
+    return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Add a New Task</Text>

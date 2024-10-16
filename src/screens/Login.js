@@ -1,30 +1,19 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Alert, StyleSheet, Text } from 'react-native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '../components/AuthContext'; // Assuming you are using AuthContext
+import { loginUser } from '../api/taskApi';  // Import the login function
+import { useAuth } from '../components/AuthContext';
 
 const Login = ({ navigation }) => {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
-    const { setJwtToken, setIsAuthenticated } = useAuth(); // Access context functions
+    const { setJwtToken, setIsAuthenticated } = useAuth();
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://192.168.8.228:1337/api/auth/local', {
-                identifier: identifier,
-                password: password
-            });
-
-            const token = response.data.jwt;
-            console.log('Login successful. JWT Token:', token);
-
+            const token = await loginUser(identifier, password);  // Use the API function
             setJwtToken(token);  // Store JWT token in AuthContext
-            setIsAuthenticated(true);  // Mark user as authenticated
-            await AsyncStorage.setItem('jwtToken', token);
-
-            console.log('Login successful');
-            navigation.navigate('Home'); // Navigate to Home after login
+            setIsAuthenticated(true);
+            navigation.navigate('Home');  // Navigate to Home after login
         } catch (error) {
             console.error('Error logging in:', error);
             Alert.alert('Login Failed', 'Please check your credentials');

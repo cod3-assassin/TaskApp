@@ -6,7 +6,6 @@ import { AuthProvider, useAuth } from './src/components/AuthContext';
 import HomeScreen from './src/screens/HomeScreen';
 import CreateTask from './src/screens/CreateTask';
 import TaskList from './src/screens/TaskList';
-import TaskDetail from './src/screens/TaskDetail';
 import Register from './src/screens/Register';
 import Login from './src/screens/Login';
 
@@ -30,8 +29,6 @@ const AppNavigator = () => {
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="CreateTask" component={CreateTask} />
       <Stack.Screen name="TaskList" component={TaskList} />
-
-      <Stack.Screen name="TaskDetail" component={TaskDetail} options={{ title: 'Task Details' }} />
       <Stack.Screen name="Register" component={Register} options={{ title: 'Register' }} />
       <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
     </Stack.Navigator>

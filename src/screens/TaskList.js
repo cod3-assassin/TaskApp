@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, Alert, ActivityIndicator, StyleSheet } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import TaskItem from '../components/TaskItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import axios from 'axios';
+import { fetchTasks, deleteTask } from '../api/taskApi';
 
 const TaskList = () => {
     const [tasks, setTasks] = useState([]);
@@ -23,18 +22,14 @@ const TaskList = () => {
 
         setLoading(true);
         try {
-            const response = await axios.get('http://192.168.8.228:1337/api/tasks');
-            const fetchedTasks = response.data.data || [];
-            setTasks(fetchedTasks);
+            const response = await fetchTasks();
+            const fetchedTasks = response.data; // Correctly extract the tasks
+            console.log('Fetched Tasks:', fetchedTasks); // Log the fetched tasks
+            setTasks(fetchedTasks); // Update the state with the fetched tasks
             setHasFetchedTasks(true);
-
-            fetchedTasks.forEach(task => {
-                console.log('Fetched task ID:', task.id);
-            });
-
         } catch (error) {
+            console.error('Error fetching tasks:', error);
             setError('Failed to fetch tasks. Please try again later.');
-            console.error(error);
         } finally {
             setLoading(false);
         }
@@ -50,21 +45,7 @@ const TaskList = () => {
                     text: 'Delete',
                     onPress: async () => {
                         try {
-                            const token = await AsyncStorage.getItem('jwtToken');
-
-                            if (!token) {
-                                Alert.alert('Error', 'You need to be logged in to delete a task.');
-                                return;
-                            }
-
-                            const response = await axios.delete(`http://192.168.8.228:1337/api/tasks/${taskId}`, {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                },
-                            });
-
-                            console.log('Deleted task ID:', taskId, 'Response status:', response.status);
-
+                            const response = await deleteTask(taskId); // Now it returns a response
                             if (response.status === 204) {
                                 setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
                                 Alert.alert('Success', 'Task has been deleted permanently.');
@@ -87,6 +68,7 @@ const TaskList = () => {
                 task.id === taskId ? { ...task, state: task.state === 'Active' ? 'Closed' : 'Active' } : task
             )
         );
+
     };
 
     const renderTaskItem = ({ item, index }) => (

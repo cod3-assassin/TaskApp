@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const TaskItem = ({ number, title, description, date, state, onDelete, onToggle }) => {
+const TaskItem = ({ number, title, description, date, state, onEdit, onDelete, onToggle }) => {
+    // Get color based on task state
     const getColorForState = () => {
         switch (state) {
             case 'new':
@@ -21,7 +22,7 @@ const TaskItem = ({ number, title, description, date, state, onDelete, onToggle 
     };
 
     const getToggleIconColor = () => {
-        return state === 'Closed' ? '#F44336' : '#4CAF50';
+        return state === 'Closed' ? '#F44336' : '#4CAF50'; // Red for Closed, Green for others
     };
 
     return (
@@ -41,8 +42,9 @@ const TaskItem = ({ number, title, description, date, state, onDelete, onToggle 
                 <Text style={[styles.state, { color: getColorForState() }]}>{state || 'No state'}</Text>
             </View>
 
-            {/* Action icons (Delete, Toggle) */}
+            {/* Action icons (Edit, Delete, Toggle) */}
             <View style={styles.actions}>
+
                 <Pressable onPress={onDelete} style={styles.icon}>
                     <Icon name="trash-outline" size={32} color="#d32f2f" />
                 </Pressable>
@@ -69,10 +71,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     numberText: {
-        fontSize: 20,
+        fontSize: 20, // Size of the number
         fontWeight: 'bold',
-        color: '#000',
-        marginRight: 10,
+        color: '#000', // Number color
+        marginRight: 10, // Space between number and task details
     },
     taskDetails: {
         flex: 1,

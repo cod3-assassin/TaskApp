@@ -1,7 +1,6 @@
-// src/screens/Register.js
 import React, { useState } from 'react';
 import { View, TextInput, Button, Alert, StyleSheet, Text } from 'react-native';
-import axios from 'axios';
+import { registerUser } from '../api/taskApi';
 
 const Register = ({ navigation }) => {
     const [username, setUsername] = useState('');
@@ -10,15 +9,11 @@ const Register = ({ navigation }) => {
 
     const handleRegister = async () => {
         try {
-            const response = await axios.post('http://192.168.8.228:1337/api/auth/local/register', {
-                username,
-                email,
-                password,
-            });
+            await registerUser(username, email, password);  // Use the API function
             Alert.alert('Success', 'Account created successfully!');
-            navigation.navigate('Login');
+            navigation.navigate('Login');  // Navigate to login after successful registration
         } catch (error) {
-            console.log('Error object:', error);
+            console.error('Error registering user:', error);
             Alert.alert('Error', error.response?.data.message || 'Registration failed');
         }
     };
