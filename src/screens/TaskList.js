@@ -45,7 +45,7 @@ const TaskList = () => {
                     text: 'Delete',
                     onPress: async () => {
                         try {
-                            const response = await deleteTask(taskId); // Now it returns a response
+                            const response = await deleteTask(taskId);
                             if (response.status === 204) {
                                 setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
                                 Alert.alert('Success', 'Task has been deleted permanently.');

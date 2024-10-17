@@ -43,11 +43,12 @@ const Register = ({ navigation }) => {
             />
             <Button title="Register" onPress={handleRegister} color="#00796b" />
             <Text style={styles.footer}>
-                Already have an account?{' '}
+                <Text style={{ color: '#000000' }}>Already have an account? </Text>
                 <Text style={styles.link} onPress={() => navigation.navigate('Login')}>
                     Login here
                 </Text>
             </Text>
+
         </View>
     );
 };
@@ -74,6 +75,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         backgroundColor: '#fff',
+        color: "black"
     },
     footer: {
         marginTop: 20,
