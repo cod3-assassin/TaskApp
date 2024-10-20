@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert, ScrollView, Pressable } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addTask } from '../api/taskApi';
+import Loader from '../components/Loader'; // Reuse the Loader component
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const CreateTask = ({ navigation }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [loading, setLoading] = useState(false); // State for loading
 
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
@@ -21,19 +24,28 @@ const CreateTask = ({ navigation }) => {
             return;
         }
 
-        const newTaskPayload = {
-            data: {
-                title: title,
-                description: description,
-                date: date.toISOString(),
-                state: 'new',
-            },
-        };
-
-        console.log('New Task Payload:', newTaskPayload);
-
         try {
-            await addTask(newTaskPayload);
+            setLoading(true); // Show loader during request
+
+            // Retrieve user ID from AsyncStorage
+            const userId = await AsyncStorage.getItem('userId');
+
+            // New task payload with user association
+            const newTaskPayload = {
+                data: {
+                    title: title,
+                    description: description,
+                    date: date.toISOString(),
+                    state: 'new',
+                    users: userId
+                },
+            };
+
+            console.log('New Task Payload:', newTaskPayload);
+
+            const response = await addTask(newTaskPayload);
+            console.log('Task Created Response:', response);
+
             Alert.alert('Success', 'Task created successfully!');
             setTitle('');
             setDescription('');
@@ -42,6 +54,8 @@ const CreateTask = ({ navigation }) => {
         } catch (error) {
             console.error('Error creating task:', error);
             Alert.alert('Error', error.response?.data?.error?.message || 'Failed to create task');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -89,6 +103,9 @@ const CreateTask = ({ navigation }) => {
                         onChange={handleDateChange}
                     />
                 )}
+
+                {/* Loader */}
+                {loading && <Loader />}
             </View>
         </ScrollView>
     );

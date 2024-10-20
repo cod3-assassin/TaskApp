@@ -1,22 +1,35 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, Text } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { registerUser } from '../api/taskApi';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Loader from '../components/Loader'; // Import the Loader component
 
 const Register = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [loading, setLoading] = useState(false); // State for loading
 
     const handleRegister = async () => {
+        setLoading(true); // Start loading
         try {
-            await registerUser(username, email, password);  // Use the API function
+            const response = await registerUser(username, email, password);
+            console.log('Registered User:', response);
             Alert.alert('Success', 'Account created successfully!');
-            navigation.navigate('Login');  // Navigate to login after successful registration
+            navigation.navigate('Login');
         } catch (error) {
             console.error('Error registering user:', error);
-            Alert.alert('Error', error.response?.data.message || 'Registration failed');
+            // Only log the error to console, don't show to user
+            Alert.alert('Error', 'Registration failed. Please try again.');
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
+
+    if (loading) {
+        return <Loader />; // Show loader while loading
+    }
 
     return (
         <View style={styles.container}>
@@ -34,13 +47,19 @@ const Register = ({ navigation }) => {
                 style={styles.input}
                 keyboardType="email-address"
             />
-            <TextInput
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                style={styles.input}
-                secureTextEntry
-            />
+            <View style={styles.passwordContainer}>
+                <TextInput
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={setPassword}
+                    style={styles.passwordInput}
+                    secureTextEntry={!passwordVisible}
+                />
+                <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.iconContainer}>
+                    <Icon name={passwordVisible ? 'visibility' : 'visibility-off'} size={20} color="#00796b" />
+                </TouchableOpacity>
+            </View>
+
             <Button title="Register" onPress={handleRegister} color="#00796b" />
             <Text style={styles.footer}>
                 <Text style={{ color: '#000000' }}>Already have an account? </Text>
@@ -48,7 +67,6 @@ const Register = ({ navigation }) => {
                     Login here
                 </Text>
             </Text>
-
         </View>
     );
 };
@@ -75,7 +93,27 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         backgroundColor: '#fff',
-        color: "black"
+        color: 'black',
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+        borderColor: '#00796b',
+        borderWidth: 1,
+        borderRadius: 5,
+        backgroundColor: '#fff',
+        height: 50,
+    },
+    passwordInput: {
+        flex: 1,
+        height: '100%',
+        paddingHorizontal: 10,
+        color: 'black',
+    },
+    iconContainer: {
+        paddingHorizontal: 10,
+        justifyContent: 'center',
     },
     footer: {
         marginTop: 20,
