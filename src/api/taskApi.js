@@ -7,25 +7,40 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_URL = "http://10.0.2.2:1337"
 
 // User login
-// User login
-// User login
 export const loginUser = async (identifier, password) => {
     try {
-        console.log('Logging in with:', { identifier, password });
+        // Sending login request to Strapi
         const response = await axios.post(`${API_URL}/api/auth/local`, {
             identifier,
             password
         });
-        const token = response.data.jwt;
-        const userId = response.data.user.id.toString(); // Convert user ID to string
-        await AsyncStorage.setItem('jwtToken', token);  // Store JWT token in AsyncStorage
-        await AsyncStorage.setItem('userId', userId);  // Store user ID in AsyncStorage
-        return token;
+
+        const token = response.data.jwt; // Get JWT token
+        const userId = response.data.user.id.toString(); // Get user ID
+        const username = response.data.user.username; // Get username
+        const email = response.data.user.email; // Get email
+
+        // Store JWT token and user details in AsyncStorage
+        await AsyncStorage.setItem('jwtToken', token);
+        await AsyncStorage.setItem('userId', userId);
+        // await AsyncStorage.setItem('username', username); // Optional: Store username
+        // await AsyncStorage.setItem('email', email); // Optional: Store email
+
+        // Return both token and user details (username and email)
+        return {
+            token,
+            user: {
+                id: userId,
+                username: username,
+                email: email
+            }
+        };
     } catch (error) {
         console.error('Error logging in:', error);
         throw error;
     }
 };
+
 
 // User registration
 export const registerUser = async (username, email, password) => {
@@ -35,7 +50,11 @@ export const registerUser = async (username, email, password) => {
             email,
             password
         });
-        return response.data;  // Return the full response to handle success
+        const token = response.data.jwt;
+        const userId = response.data.user.id.toString(); // Convert user ID to string
+        await AsyncStorage.setItem('jwtToken', token);  // Store JWT token in AsyncStorage
+        await AsyncStorage.setItem('userId', userId);  // Store user ID in AsyncStorage
+        return response.data;
     } catch (error) {
         console.error('Error registering user:', error);
         throw error;
@@ -43,20 +62,24 @@ export const registerUser = async (username, email, password) => {
 };
 
 
+
+// Fetch tasks for the logged-in user
 // Fetch tasks for the logged-in user
 export const fetchTasks = async () => {
     try {
         const token = await AsyncStorage.getItem('jwtToken');
-        console.log('Fetching tasks with token:', token); // Log the token
+        const userId = await AsyncStorage.getItem('userId'); // Fetch the logged-in user ID
+        // console.log('Fetching tasks for user with ID:', userId); // Log user ID
 
-
-        const response = await axios.get(`${API_URL}/api/tasks`, {
+        // Use populate to include the user relation and filter tasks for the specific user
+        const response = await axios.get(`${API_URL}/api/tasks?populate=user&filters[user][id][$eq]=${userId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
-        return response.data; // Make sure this is returning the expected data
+        // console.log('Fetched Tasks Response:', response.data); // Log the full response
+        return response.data; // Return the fetched data
     } catch (error) {
         console.error('Error fetching tasks:', error.response ? error.response.data : error);
         throw error;
@@ -68,6 +91,9 @@ export const fetchTasks = async () => {
 // Add new task
 export const addTask = async (taskData) => {
     const token = await AsyncStorage.getItem('jwtToken'); // Get the JWT token
+    const userId = await AsyncStorage.getItem('userId'); // Get the user ID
+
+    const taskWithUser = { ...taskData, user: userId }; // Attach user ID to the task data
 
     const config = {
         headers: {
@@ -77,49 +103,53 @@ export const addTask = async (taskData) => {
     };
 
     try {
-        const response = await axios.post(`${API_URL}/api/tasks`, taskData, config); // Ensure correct endpoint
-        console.log('Strapi Response:', response.data); // Log the full response data
-        return response.data;
+        const response = await axios.post(`${API_URL}/api/tasks`, taskWithUser, config);
+        // console.log('Strapi Response:', response.data);
+        // return response.data;
     } catch (error) {
-        console.error('Error adding task:', error.response?.data || error.message); // Log error details
-        throw error; // Re-throw the error to handle it in the calling function
+        console.error('Error adding task:', error.response ? error.response.data : error.message);
+        throw error;
     }
 };
 
 
-// Update task
 export const updateTask = async (taskId, updatedData) => {
     try {
         const token = await AsyncStorage.getItem('jwtToken');
-        const response = await axios.put(`${API_URL}/api/tasks/${taskId}`, updatedData, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        // Make sure the data is sent inside a `data` object
+        const response = await axios.put(`${API_URL}/api/tasks/${taskId}`,
+            { data: updatedData },  // Wrap the updatedData inside `data`
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',  // Ensure content type is set correctly
+                }
             }
-        });
+        );
         return response.data;
     } catch (error) {
         console.error('Error updating task:', error);
-        throw error; // Re-throw to handle it in the caller
+        throw error;  // Re-throw to handle it in the caller
     }
 };
 
 
 
-
-// Delete task
-// Delete task
 export const deleteTask = async (taskId) => {
     try {
         const token = await AsyncStorage.getItem('jwtToken');
         const response = await axios.delete(`${API_URL}/api/tasks/${taskId}`, {
             headers: {
-                Authorization: `Bearer ${token}`
-            }
+                Authorization: `Bearer ${token}`,
+            },
         });
-        console.log(`Task ${taskId} deleted successfully`);
-        return response; // Return the response
+        // console.log('Delete Response:', response);
+        return response; // You should check response status here
     } catch (error) {
-        console.error('Error deleting task:', error);
-        throw error; // Rethrow the error for handling
+        console.error('Error deleting task:', error.response ? error.response.data : error.message);
+        throw error;
     }
 };
+
+
+

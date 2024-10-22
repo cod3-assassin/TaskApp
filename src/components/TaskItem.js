@@ -1,50 +1,53 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
 
-const TaskItem = ({ number, title, description, date, state, onEdit, onDelete, onToggle }) => {
-    // Get color based on task state
+const TaskItem = ({ number, title, description, date, state, onDelete, onToggle }) => {
     const getColorForState = () => {
         switch (state) {
             case 'new':
-                return '#4CAF50'; // Green
-            case 'Active':
-                return '#FF9800'; // Orange
-            case 'Closed':
-                return '#F44336'; // Red
+                return '#4CAF50';
+            case 'active':
+                return '#FF9800';
+            case 'closed':
+                return '#F44336';
             default:
-                return '#9E9E9E'; // Grey for undefined state
+                return '#9E9E9E';
         }
     };
 
     const getToggleIconName = () => {
-        return state === 'Closed' ? 'close-circle-outline' : 'checkmark-circle-outline';
+        return state === 'closed' ? 'close-circle-outline' : 'checkmark-circle-outline';
     };
 
     const getToggleIconColor = () => {
-        return state === 'Closed' ? '#F44336' : '#4CAF50'; // Red for Closed, Green for others
+
+        switch (state) {
+            case "new":
+                return "#4CAF50";
+            case "active":
+                return "#FF9800"
+            case "closed":
+                return "#F44336"
+        }
     };
 
     return (
-        <View style={styles.container}>
+        <LinearGradient
+            colors={['#003f55', '#00587a', '#007d99']}
+            style={styles.container}
+        >
             <View style={styles.header}>
-                {/* Task number */}
                 <Text style={styles.numberText}>{number}</Text>
-
-                {/* Task Title and Details */}
                 <View style={styles.taskDetails}>
                     <Text style={styles.title}>{title || 'Untitled Task'}</Text>
                     <Text style={styles.description}>{description || 'No description available'}</Text>
                     <Text style={styles.date}>{date || 'No date provided'}</Text>
                 </View>
-
-                {/* Task State */}
                 <Text style={[styles.state, { color: getColorForState() }]}>{state || 'No state'}</Text>
             </View>
-
-            {/* Action icons (Edit, Delete, Toggle) */}
             <View style={styles.actions}>
-
                 <Pressable onPress={onDelete} style={styles.icon}>
                     <Icon name="trash-outline" size={32} color="#d32f2f" />
                 </Pressable>
@@ -52,18 +55,16 @@ const TaskItem = ({ number, title, description, date, state, onEdit, onDelete, o
                     <Icon name={getToggleIconName()} size={32} color={getToggleIconColor()} />
                 </Pressable>
             </View>
-        </View>
+        </LinearGradient>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         padding: 20,
-        backgroundColor: '#fff',
         borderRadius: 10,
         elevation: 3,
         marginVertical: 10,
-        width: '100%',
     },
     header: {
         flexDirection: 'row',
@@ -71,10 +72,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     numberText: {
-        fontSize: 20, // Size of the number
+        fontSize: 20,
         fontWeight: 'bold',
-        color: '#000', // Number color
-        marginRight: 10, // Space between number and task details
+        color: '#ffffff',
+        marginRight: 10,
     },
     taskDetails: {
         flex: 1,
@@ -82,15 +83,15 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: "black"
+        color: "#ffffff",
     },
     description: {
         fontSize: 14,
-        color: '#555',
+        color: '#ffffff',
     },
     date: {
         fontSize: 12,
-        color: '#999',
+        color: '#ffffff',
     },
     state: {
         fontSize: 16,

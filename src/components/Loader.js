@@ -1,12 +1,18 @@
-// Loader.js
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
-const Loader = () => {
+const Loader = ({ message = 'Loading...' }) => {
     return (
-        <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color="#00796b" />
-        </View>
+        <LinearGradient
+            colors={['#0A2E4D', '#003B5C', '#005C8E']}
+            style={styles.loaderContainer}
+        >
+            <View style={styles.loaderContent}>
+                <ActivityIndicator size="large" color="#00BFFF" />
+                <Text style={styles.loadingText}>{message}</Text>
+            </View>
+        </LinearGradient>
     );
 };
 
@@ -15,7 +21,15 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: Semi-transparent background
+    },
+    loaderContent: {
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#ffffff',
     },
 });
 
