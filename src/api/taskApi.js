@@ -97,7 +97,7 @@ export const addTask = async (taskData) => {
 
     const config = {
         headers: {
-            Authorization: `Bearer ${token}`, // Set the authorization header
+            Authorization: `Bearer ${token}`, 
             'Content-Type': 'application/json',
         },
     };
@@ -129,7 +129,7 @@ export const updateTask = async (taskId, updatedData) => {
         return response.data;
     } catch (error) {
         console.error('Error updating task:', error);
-        throw error;  // Re-throw to handle it in the caller
+        throw error;  
     }
 };
 
@@ -144,7 +144,7 @@ export const deleteTask = async (taskId) => {
             },
         });
         // console.log('Delete Response:', response);
-        return response; // You should check response status here
+        return response;
     } catch (error) {
         console.error('Error deleting task:', error.response ? error.response.data : error.message);
         throw error;
